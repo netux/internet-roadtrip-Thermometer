@@ -6,6 +6,7 @@
 // @grant       GM_addStyle
 // @version     0.0.0
 // @author      process.env.AUTHOR
+// @require     https://cdn.jsdelivr.net/npm/internet-roadtrip-framework@0.4.1-beta
 // @require     https://cdn.jsdelivr.net/npm/@violentmonkey/dom@2
 // @require     https://cdn.jsdelivr.net/npm/@violentmonkey/ui@0.7
 // ==/UserScript==

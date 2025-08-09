@@ -1,5 +1,6 @@
-import { createSignal } from 'solid-js';
+import { createSignal, onMount } from 'solid-js';
 import { render } from 'solid-js/web';
+import IRF from 'internet-roadtrip-framework';
 import { getPanel, showToast } from '@violentmonkey/ui';
 // global CSS
 import globalCss from './style.css';
@@ -7,13 +8,22 @@ import globalCss from './style.css';
 import styles, { stylesheet } from './style.module.css';
 
 function Counter() {
+  const [containerVDOM, setContainerVDOM] = createSignal(null);
   const [getCount, setCount] = createSignal(0);
   const handleAmazing = () => {
     setCount((count) => count + 1);
     showToast('Amazing + 1', { theme: 'dark' });
   };
+
+  onMount(() => {
+    IRF.vdom.container.then((containerVDOM) => {
+      setContainerVDOM(containerVDOM);
+    });
+  });
+
   return (
     <div>
+      Container VDOM is {containerVDOM() ? 'initialized' : 'not there yet...'}
       <button class={styles.plus1} onClick={handleAmazing}>
         Amazing+1
       </button>

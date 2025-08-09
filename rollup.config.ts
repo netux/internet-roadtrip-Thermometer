@@ -56,11 +56,16 @@ export default defineConfig(
             meta.replace('process.env.AUTHOR', packageJson.author!.name!),
           ),
         ],
-        external: defineExternal(['@violentmonkey/ui', '@violentmonkey/dom']),
+        external: defineExternal([
+          'internet-roadtrip-framework',
+          '@violentmonkey/ui',
+          '@violentmonkey/dom',
+        ]),
         output: {
           format: 'iife',
           file: `dist/${name}.user.js`,
           globals: {
+            'internet-roadtrip-framework': 'IRF',
             '@violentmonkey/dom': 'VM',
             '@violentmonkey/ui': 'VM',
           },
