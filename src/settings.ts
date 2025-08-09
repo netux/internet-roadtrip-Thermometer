@@ -1,0 +1,112 @@
+import { createSignal } from 'solid-js';
+import { TEMPERATURE_UNITS } from './constants';
+import { zeroOne } from './util';
+
+/* #region Overlay Position */
+export interface OverlayPositionSetting {
+  x: number;
+  y: number;
+}
+
+export const DEFAULT_OVERLAY_POSITION: OverlayPositionSetting = {
+  x: 0.5,
+  y: 0.5,
+};
+/* #endregion Overlay Position */
+
+/* #region Default Temperature Gradient */
+export const DEFAULT_TEMPERATURE_GRADIENT = [
+  { temperatureCelsius: -20, color: '#f5f5f5' },
+  { temperatureCelsius: -10, color: '#82cdff' },
+  { temperatureCelsius: 0, color: '#0c9eff' },
+  { temperatureCelsius: 15, color: '#043add' },
+  { temperatureCelsius: 18.5, color: '#c0c23d' },
+  { temperatureCelsius: 22.5, color: '#ffd86d' },
+  { temperatureCelsius: 27.5, color: '#ffa538' },
+  { temperatureCelsius: 32.5, color: '#c92626' },
+  { temperatureCelsius: 40, color: '#6a0b39' },
+];
+
+export const {
+  min: DEFAULT_TEMPERATURE_GRADIENT_MIN_TEMPERATURE,
+  max: DEFAULT_TEMPERATURE_GRADIENT_MAX_TEMPERATURE,
+} = DEFAULT_TEMPERATURE_GRADIENT.reduce(
+  ({ min: previousMin, max: previousMax }, { temperatureCelsius }) => ({
+    min: Math.min(temperatureCelsius, previousMin),
+    max: Math.max(temperatureCelsius, previousMax),
+  }),
+  { min: 0, max: 0 },
+);
+
+export const getDefaultTemperatureGradientSettings = () => ({
+  temperatureGradient: DEFAULT_TEMPERATURE_GRADIENT.map(
+    ({ temperatureCelsius, color }) => ({
+      percent: zeroOne(
+        temperatureCelsius,
+        DEFAULT_TEMPERATURE_GRADIENT_MIN_TEMPERATURE,
+        DEFAULT_TEMPERATURE_GRADIENT_MAX_TEMPERATURE,
+      ),
+      color,
+    }),
+  ),
+  temperatureGradientMinCelsius: DEFAULT_TEMPERATURE_GRADIENT_MIN_TEMPERATURE,
+  temperatureGradientMaxCelsius: DEFAULT_TEMPERATURE_GRADIENT_MAX_TEMPERATURE,
+});
+/* #endregion Default Temperature Gradient */
+
+export interface TemperatureColorStop {
+  percent: number;
+  color: string;
+}
+
+export interface Settings {
+  overlayPosition: OverlayPositionSetting;
+  temperatureUnit: keyof typeof TEMPERATURE_UNITS;
+  temperatureGradient: TemperatureColorStop[];
+  temperatureGradientMinCelsius: number;
+  temperatureGradientMaxCelsius: number;
+}
+
+const [settings, setSettings] = createSignal<Settings>({
+  overlayPosition: DEFAULT_OVERLAY_POSITION,
+  temperatureUnit: 'celsius',
+  ...getDefaultTemperatureGradientSettings(),
+});
+
+export { settings };
+
+// Load
+{
+  const newSettings: Settings = { ...settings() };
+
+  // Migration from <=1.2.2, when the overlay position was null by default
+  if (newSettings.overlayPosition == null) {
+    newSettings.overlayPosition = DEFAULT_OVERLAY_POSITION;
+  }
+
+  for (const key in settings()) {
+    newSettings[key] = await GM.getValue(key, newSettings[key]);
+  }
+
+  setSettings(newSettings);
+}
+
+// Save
+export async function saveSettings(
+  change?: Partial<Settings> | ((prevSettings: Settings) => Settings),
+) {
+  if (typeof change === 'function') {
+    setSettings(change);
+  } else if (typeof change === 'object') {
+    setSettings((prevSettings) => ({
+      ...prevSettings,
+      change,
+    }));
+  }
+
+  const currentSettings = settings();
+
+  for (const key in currentSettings) {
+    await GM.setValue(key, currentSettings[key]);
+  }
+}
