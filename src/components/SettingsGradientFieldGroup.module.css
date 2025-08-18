@@ -22,6 +22,8 @@
 
   & .gradient-range {
     --inputs-size: 8ch;
+    --inputs-size-padding: 3ch;
+    --inputs-full-size: calc(var(--inputs-size) + var(--inputs-size-padding));
 
     display: flex;
     justify-content: space-between;
@@ -33,10 +35,10 @@
         linear-gradient(
           to right,
           black 0%,
-          black 20%,
-          transparent 30%,
-          transparent 70%,
-          black 80%,
+          black var(--inputs-full-size),
+          transparent calc(var(--inputs-full-size) + 10%),
+          transparent calc(100% - var(--inputs-full-size) - 10%),
+          black calc(100% - var(--inputs-full-size)),
           black 100%
         );
     background-size: auto 3px;
