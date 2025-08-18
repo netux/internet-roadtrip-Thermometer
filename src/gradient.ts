@@ -4,7 +4,9 @@ import { zeroOne } from './util';
 
 export const temperatureCanvasGradientCtx = document
   .createElement('canvas')
-  .getContext('2d');
+  .getContext('2d', {
+    willReadFrequently: true,
+  });
 
 export function redrawTemperatureCanvas() {
   temperatureCanvasGradientCtx.canvas.width = Math.abs(
