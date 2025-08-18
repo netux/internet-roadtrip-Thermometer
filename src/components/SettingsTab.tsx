@@ -6,7 +6,7 @@ import {
 } from '../constants';
 import SettingsFieldGroup from './SettingsFieldGroup';
 import SettingsGradientFieldGroup from './SettingsGradientFieldGroup';
-import { DEFAULT_OVERLAY_POSITION, saveSettings, settings } from '../settings';
+import { DEFAULT_WIDGET_POSITION, saveSettings, settings } from '../settings';
 import SingleInstanceStyle from './SingleInstanceStyle';
 import { stylesheet } from './SettingsTab.module.css';
 
@@ -43,7 +43,7 @@ export default () => {
       <button
         on:click={async () => {
           await saveSettings({
-            overlayPosition: DEFAULT_OVERLAY_POSITION,
+            widgetPosition: DEFAULT_WIDGET_POSITION,
           });
         }}
       >

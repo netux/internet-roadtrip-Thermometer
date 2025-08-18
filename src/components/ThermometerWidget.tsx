@@ -38,7 +38,7 @@ export default ({ panel }: Props) => {
     await saveSettings((prevSettings) => {
       return {
         ...prevSettings,
-        overlayPosition: {
+        widgetPosition: {
           x: left / window.innerWidth,
           y: top / window.innerHeight,
         },
@@ -68,21 +68,21 @@ export default ({ panel }: Props) => {
     }
   });
 
-  createEffect((prevOverlayPosition: { x: number; y: number }) => {
-    const newOverlayPosition = settings().overlayPosition;
+  createEffect((prevWidgetPosition: { x: number; y: number }) => {
+    const newWidgetPosition = settings().widgetPosition;
 
     if (
-      newOverlayPosition.x !== prevOverlayPosition.x ||
-      newOverlayPosition.y !== prevOverlayPosition.y
+      newWidgetPosition.x !== prevWidgetPosition.x ||
+      newWidgetPosition.y !== prevWidgetPosition.y
     ) {
       panel.movable.setPosition(
-        newOverlayPosition.x * window.innerWidth,
-        newOverlayPosition.y * window.innerHeight,
+        newWidgetPosition.x * window.innerWidth,
+        newWidgetPosition.y * window.innerHeight,
       );
     }
 
-    return newOverlayPosition;
-  }, settings().overlayPosition);
+    return newWidgetPosition;
+  }, settings().widgetPosition);
 
   const userTemperatureUnit = createMemo(
     () => TEMPERATURE_UNITS[settings().temperatureUnit],

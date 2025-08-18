@@ -28,8 +28,8 @@ function createWidget() {
   panel.show();
 
   panel.movable.setPosition(
-    settings().overlayPosition.x * window.innerWidth,
-    settings().overlayPosition.y * window.innerHeight,
+    settings().widgetPosition.x * window.innerWidth,
+    settings().widgetPosition.y * window.innerHeight,
   );
 }
 

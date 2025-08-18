@@ -2,13 +2,8 @@ import { createSignal } from 'solid-js';
 import { TemperatureUnits } from './constants';
 import { zeroOne } from './util';
 
-/* #region Overlay Position */
-export interface OverlayPositionSetting {
-  x: number;
-  y: number;
-}
-
-export const DEFAULT_OVERLAY_POSITION: OverlayPositionSetting = {
+/* #region Widget Position */
+export const DEFAULT_WIDGET_POSITION = {
   x: 0.5,
   y: 0.5,
 };
@@ -60,7 +55,7 @@ export interface TemperatureColorStop {
 }
 
 export interface Settings {
-  overlayPosition: { x: number; y: number };
+  widgetPosition: { x: number; y: number };
   temperatureUnit: TemperatureUnits;
   temperatureGradient: TemperatureColorStop[];
   temperatureGradientMinCelsius: number;
@@ -68,7 +63,7 @@ export interface Settings {
 }
 
 const [settings, setSettings] = createSignal<Settings>({
-  overlayPosition: DEFAULT_OVERLAY_POSITION,
+  widgetPosition: DEFAULT_WIDGET_POSITION,
   temperatureUnit: 'celsius',
   ...getDefaultTemperatureGradientSettings(),
 });
@@ -79,13 +74,36 @@ export { settings };
 {
   const newSettings: Settings = { ...settings() };
 
-  // Migration from <=1.2.2, when the overlay position was null by default
-  if (newSettings.overlayPosition == null) {
-    newSettings.overlayPosition = DEFAULT_OVERLAY_POSITION;
-  }
-
   for (const key in settings()) {
     newSettings[key] = await GM.getValue(key, newSettings[key]);
+  }
+
+  // Migration from <2.0.0, when the widget was refered to as an overlay
+  {
+    const noValue = Symbol();
+    type WidgetPositionType =
+      | Settings['widgetPosition']
+      | null
+      | typeof noValue;
+
+    const hasWidgetPositionValue =
+      (await GM.getValue<WidgetPositionType>(
+        'widgetPosition' as keyof Settings,
+        noValue,
+      )) === noValue;
+    const oldOverlayPositionValue = await GM.getValue<WidgetPositionType>(
+      'overlayPosition',
+      noValue,
+    );
+    if (!hasWidgetPositionValue && oldOverlayPositionValue !== noValue) {
+      newSettings.widgetPosition = oldOverlayPositionValue;
+      await GM.deleteValue('overlayPosition');
+    }
+  }
+
+  // Migration from <=1.2.2, when the widget position was null by default
+  if (newSettings.widgetPosition == null) {
+    newSettings.widgetPosition = DEFAULT_WIDGET_POSITION;
   }
 
   setSettings(newSettings);
