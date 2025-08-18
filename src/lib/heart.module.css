@@ -1,0 +1,53 @@
+@keyframes petting-heart-movement {
+  0% {
+    translate: 0 0;
+    rotate: 0deg;
+  }
+  25% {
+    translate: -10% 0;
+    rotate: 25deg;
+  }
+  50% {
+    translate: 0% 0;
+    rotate: 0deg;
+  }
+  75% {
+    translate: 10% 0;
+    rotate: -25deg;
+  }
+}
+
+/* Based on https://css-tricks.com/hearts-in-html-and-css/#aa-css-shape */
+.petting-heart {
+  --size: 10px;
+
+  position: fixed;
+  background-color: red;
+  margin: 0 calc(var(--size) / 3);
+  width: var(--size);
+  aspect-ratio: 1;
+  display: inline-block;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  animation: petting-heart-movement 2s linear infinite;
+  z-index: 0;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: var(--size);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: red;
+  }
+
+  &::before {
+    top: calc(var(--size) / -2);
+    left: 0;
+  }
+
+  &::after {
+    left: calc(var(--size) / 2);
+    top: 0;
+  }
+}

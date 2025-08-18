@@ -2,6 +2,7 @@ import {
   createEffect,
   createMemo,
   createSignal,
+  onCleanup,
   onMount,
   Show,
 } from 'solid-js';
@@ -13,13 +14,16 @@ import { sampleTemperatureGradient } from '../gradient';
 import { TEMPERATURE_UNITS } from '../constants';
 import SingleInstanceStyle from './SingleInstanceStyle';
 import ThermometerGraphic from './ThermometerGraphic';
+import { Pet } from '../lib/pet';
+import { Heart } from '../lib/heart';
 
 export type Props = IPanelBodyProps;
 
 export default ({ panel }: Props) => {
+  let graphicEl: SVGSVGElement;
+
   const [isBeingGrabbed, setIsBeingGrabbed] = createSignal(false);
   const [isInfoOnTheRight, setIsInfoOnTheRight] = createSignal(false);
-  const [graphicElRef, setGraphicElRef] = createSignal<SVGElement>();
 
   const onPanelMoving = () => {
     const { left, width } = panel.wrapperEl.getBoundingClientRect();
@@ -46,26 +50,64 @@ export default ({ panel }: Props) => {
     });
   };
 
+  const setupPet = () => {
+    const pet = new Pet(graphicEl, {
+      sampleRate: 100,
+      max: 10,
+      threshold: 2.5,
+      activation: 3,
+      neglect: 0.5,
+      angleMin: -20,
+      angleMax: 20,
+    });
+
+    let spawnHeartsInterval: NodeJS.Timeout | null = null;
+
+    pet.addEventListener('petting-start', () => {
+      let spawnNextHeartGoingRight = false;
+      spawnHeartsInterval = setInterval(() => {
+        const boundingBox = pet.petEl.getBoundingClientRect();
+
+        new Heart({
+          initialPosX:
+            boundingBox.left +
+            boundingBox.width * (spawnNextHeartGoingRight ? 2 / 3 : 1 / 3),
+          initialPosY: boundingBox.top + boundingBox.height / 3,
+          velocityX: 0.25 * (spawnNextHeartGoingRight ? 1 : -1),
+          velocityY: -0.5,
+          maxLifetime: 5000,
+        });
+
+        spawnNextHeartGoingRight = !spawnNextHeartGoingRight;
+      }, 500);
+    });
+
+    pet.addEventListener('petting-end', () => {
+      clearInterval(spawnHeartsInterval);
+      spawnHeartsInterval = null;
+    });
+  };
+
   onMount(() => {
     panel.movable.addEventListener('move-start', onPanelMoveStart);
     panel.movable.addEventListener('moving', onPanelMoving);
     panel.movable.addEventListener('move-end', onPanelMoveEnd);
 
+    panel.movable.applyOptions({
+      handlerElements: [graphicEl],
+    });
+
     panel.movable.enable();
 
-    return () => {
-      panel.movable.removeEventListener('move-start', onPanelMoveStart);
-      panel.movable.removeEventListener('moving', onPanelMoving);
-      panel.movable.removeEventListener('move-end', onPanelMoveEnd);
-    };
+    setupPet();
   });
 
-  createEffect(() => {
-    if (graphicElRef()) {
-      panel.movable.applyOptions({
-        handlerElements: [graphicElRef()],
-      });
-    }
+  onCleanup(() => {
+    panel.movable.disable();
+
+    panel.movable.removeEventListener('move-start', onPanelMoveStart);
+    panel.movable.removeEventListener('moving', onPanelMoving);
+    panel.movable.removeEventListener('move-end', onPanelMoveEnd);
   });
 
   createEffect((prevWidgetPosition: { x: number; y: number }) => {
@@ -144,7 +186,7 @@ export default ({ panel }: Props) => {
         fillPercent={graphicFillPercent()}
         color={graphicColor()}
         class={styles['graphic']}
-        ref={(graphicElRef) => setGraphicElRef(graphicElRef)}
+        ref={graphicEl}
       />
     </div>
   );
