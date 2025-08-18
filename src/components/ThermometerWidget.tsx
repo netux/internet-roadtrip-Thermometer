@@ -10,7 +10,10 @@ import styles, { stylesheet } from './ThermometerWidget.module.css';
 import { IPanelBodyProps } from '../lib/panel';
 import * as globalState from '../global-state';
 import { saveSettings, settings } from '../settings';
-import { sampleTemperatureGradient } from '../gradient';
+import {
+  sampleTemperatureGradient,
+  temperatureGradientHasRedrawn,
+} from '../gradient';
 import { TEMPERATURE_UNITS } from '../constants';
 import SingleInstanceStyle from './SingleInstanceStyle';
 import ThermometerGraphic from './ThermometerGraphic';
@@ -143,14 +146,26 @@ export default ({ panel }: Props) => {
     return forecast.current.temperature_2m / temperatureGradientLength;
   }, 0);
 
-  const graphicColor = createMemo<string | null>((prev) => {
-    const forecast = globalState.forecast();
-    if (!forecast) {
-      return prev;
+  const currentTemperatureCelsius = createMemo<number | null>(
+    (previousTemperatureCelsius) => {
+      const forecast = globalState.forecast();
+      if (!forecast) {
+        // Preserve previous temperature
+        return previousTemperatureCelsius;
+      }
+
+      return forecast.current.temperature_2m;
+    },
+    null,
+  );
+
+  const graphicColor = createMemo<string | null>(() => {
+    if (!(currentTemperatureCelsius() || temperatureGradientHasRedrawn())) {
+      return null;
     }
 
-    return sampleTemperatureGradient(forecast.current.temperature_2m);
-  }, null);
+    return sampleTemperatureGradient(currentTemperatureCelsius());
+  });
 
   return (
     <div

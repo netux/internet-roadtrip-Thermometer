@@ -6,7 +6,7 @@ import {
 import {
   sampleTemperatureGradient,
   temperatureAtGradient,
-  temperatureCanvasGradientCtx,
+  temperatureGradientCanvas,
 } from '../gradient';
 import {
   settings,
@@ -145,7 +145,7 @@ const GradientContainer = () => {
        * This is kinda cursed, but it works!
        * And it saves us from having to keep two images synced with each other.
        */}
-      {temperatureCanvasGradientCtx.canvas}
+      {temperatureGradientCanvas}
 
       <div class={styles['stops-container']}>
         <Index each={settings().temperatureGradient}>
