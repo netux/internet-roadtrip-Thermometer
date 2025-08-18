@@ -1,8 +1,4 @@
-import {
-  MOD_DOM_SAFE_PREFIX,
-  TEMPERATURE_UNITS,
-  TemperatureUnits,
-} from '../constants';
+import { MOD_DOM_SAFE_PREFIX, TEMPERATURE_UNITS } from '../constants';
 import {
   sampleTemperatureGradient,
   temperatureAtGradient,
@@ -23,12 +19,14 @@ import GradientColorStop from './GradientColorStop';
 
 interface GradientRangeInputProps {
   id: string;
-  value: number;
-  onChange: (value: number) => void;
-  unit: TemperatureUnits;
+  valueCelsius: number;
+  onChange: (valueCelsius: number) => void;
 }
 
 const GradientRangeInput = (props: GradientRangeInputProps) => {
+  const userTemperatureUnit = () =>
+    TEMPERATURE_UNITS[settings().temperatureUnit];
+
   const onChange = (event: Event) => {
     const numberValue = parseFloat(
       (event.currentTarget as HTMLInputElement).value,
@@ -37,7 +35,7 @@ const GradientRangeInput = (props: GradientRangeInputProps) => {
       return;
     }
 
-    props.onChange(numberValue);
+    props.onChange(userTemperatureUnit().toCelsius(numberValue));
   };
 
   return (
@@ -45,10 +43,10 @@ const GradientRangeInput = (props: GradientRangeInputProps) => {
       <input
         id={props.id}
         type="number"
-        value={props.value}
+        value={userTemperatureUnit().fromCelsius(props.valueCelsius)}
         on:change={onChange}
       />
-      {TEMPERATURE_UNITS[props.unit].unit}
+      {userTemperatureUnit().unit}
     </div>
   );
 };
@@ -67,18 +65,15 @@ const GradientRange = () => {
 
   return (
     <div class={styles['gradient-range']}>
-      {/* TODO(netux): show in the user's temperature */}
       <GradientRangeInput
         id={`${MOD_DOM_SAFE_PREFIX}gradient-temperature-min`}
-        value={settings().temperatureGradientMinCelsius}
+        valueCelsius={settings().temperatureGradientMinCelsius}
         onChange={onChangeMin}
-        unit={'celsius'}
       />
       <GradientRangeInput
         id={`${MOD_DOM_SAFE_PREFIX}gradient-temperature-max`}
-        value={settings().temperatureGradientMaxCelsius}
+        valueCelsius={settings().temperatureGradientMaxCelsius}
         onChange={onChangeMax}
-        unit={'celsius'}
       />
     </div>
   );
