@@ -21,6 +21,10 @@ export default (props: Props) => {
   const onMouseDown = (event: MouseEvent) => {
     event.preventDefault();
 
+    if (event.button !== 0 /* left click */) {
+      return;
+    }
+
     draggingState = {
       startPos: { x: event.clientX, y: event.clientY },
     };
