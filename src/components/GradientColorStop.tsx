@@ -14,36 +14,38 @@ export default (props: Props) => {
   let stopEl: HTMLDivElement;
   let colorInputEl: HTMLInputElement;
 
-  let lastDragStartPos: { x: number; y: number } | null = null;
-  let isDragging = false;
+  let draggingState: {
+    startPos: { x: number; y: number };
+  } | null = null;
 
   const onMouseDown = (event: MouseEvent) => {
     event.preventDefault();
 
-    lastDragStartPos = { x: event.clientX, y: event.clientY };
-    isDragging = true;
+    draggingState = {
+      startPos: { x: event.clientX, y: event.clientY },
+    };
   };
 
   const onDocumentMouseUp = (event: MouseEvent) => {
-    if (!isDragging) {
+    if (draggingState == null) {
       return;
     }
 
     event.preventDefault();
 
-    isDragging = false;
-
     if (
-      Math.abs(lastDragStartPos.x - event.clientX) +
-        Math.abs(lastDragStartPos.y - event.clientY) <
+      Math.abs(draggingState.startPos.x - event.clientX) +
+        Math.abs(draggingState.startPos.y - event.clientY) <
       5
     ) {
       colorInputEl.click();
     }
+
+    draggingState = null;
   };
 
   const onDocumentMouseMove = (event: MouseEvent) => {
-    if (!isDragging) {
+    if (draggingState == null) {
       return;
     }
 
