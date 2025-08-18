@@ -22,17 +22,20 @@ export default (props: Props) => {
       settings().temperatureGradientMaxCelsius,
     );
 
-  const prettyTemperature = () => {
+  const prettyTemperatureValue = (value: number) => {
     switch (props.type) {
       case GradientMarkerType.CURSOR: {
         // Round to closest multiple of 0.5
-        return (Math.round(props.temperatureCelsius * 2) / 2).toFixed(1);
+        return (Math.round(value * 2) / 2).toFixed(1);
       }
       default: {
-        return Math.round(props.temperatureCelsius).toFixed(0);
+        return Math.round(value).toFixed(0);
       }
     }
   };
+
+  const userTemperatureUnit = () =>
+    TEMPERATURE_UNITS[settings().temperatureUnit];
 
   return (
     <>
@@ -48,9 +51,10 @@ export default (props: Props) => {
           left: `${temperaturePercent() * 100}%`,
         }}
       >
-        {/* TODO(netux): show in the user's temperature */}
-        {prettyTemperature()}
-        {TEMPERATURE_UNITS.celsius.unit}
+        {prettyTemperatureValue(
+          userTemperatureUnit().fromCelsius(props.temperatureCelsius),
+        )}
+        {userTemperatureUnit().unit}
       </span>
     </>
   );
