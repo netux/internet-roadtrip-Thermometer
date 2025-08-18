@@ -99,7 +99,7 @@ export default (props: Props) => {
         <input
           type="color"
           value={props.color}
-          on:change={onColorInputChange}
+          on:input={onColorInputChange}
           ref={colorInputEl}
         />
       </div>
