@@ -55,12 +55,26 @@ const GradientRange = () => {
   const onChangeMin = (newMinTemperatureCelsius: number) =>
     saveSettings((previousSettings) => ({
       ...previousSettings,
-      temperatureGradientMinCelsius: newMinTemperatureCelsius,
+      temperatureGradientMinCelsius: Math.min(
+        newMinTemperatureCelsius,
+        previousSettings.temperatureGradientMaxCelsius,
+      ),
+      temperatureGradientMaxCelsius: Math.max(
+        newMinTemperatureCelsius,
+        previousSettings.temperatureGradientMaxCelsius,
+      ),
     }));
   const onChangeMax = (newMaxTemperatureCelsius: number) =>
     saveSettings((previousSettings) => ({
       ...previousSettings,
-      temperatureGradientMaxCelsius: newMaxTemperatureCelsius,
+      temperatureGradientMinCelsius: Math.min(
+        previousSettings.temperatureGradientMinCelsius,
+        newMaxTemperatureCelsius,
+      ),
+      temperatureGradientMaxCelsius: Math.max(
+        previousSettings.temperatureGradientMinCelsius,
+        newMaxTemperatureCelsius,
+      ),
     }));
 
   return (
