@@ -49,7 +49,7 @@ export function sampleTemperatureGradient(temperatureCelsius: number) {
   );
   const clampedPercent = Math.max(0, Math.min(percent, 1));
 
-  const x = clampedPercent * temperatureCanvasGradientCtx.canvas.width - 1;
+  const x = clampedPercent * (temperatureCanvasGradientCtx.canvas.width - 1);
 
   const rgb = temperatureCanvasGradientCtx
     .getImageData(x, 0, 1, 1)
