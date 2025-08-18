@@ -1,0 +1,88 @@
+input:is(:not([type]), [type='text'], [type='number']),
+select {
+  --padding-inline: 0.5rem;
+  --border-radius: 0.8rem;
+  --border-color: #848e95;
+
+  width: calc(100% - 2 * var(--padding-inline));
+  min-height: 1.5rem;
+  margin: 0;
+  padding-inline: var(--padding-inline);
+  color: white;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  font-size: 100%;
+  border-radius: var(--border-radius);
+}
+
+option {
+  background-color: black;
+}
+
+@supports (appearance: base-select) {
+  select,
+  ::picker(select) {
+    appearance: base-select;
+    font-size: 0.9rem;
+  }
+
+  select::picker-icon {
+    scale: 0.9;
+    margin-right: 0.125rem;
+  }
+
+  select:open {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-color: transparent;
+  }
+
+  ::picker(select) {
+    margin-top: -1px;
+    border: none;
+    background-color: black;
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    border-top-color: transparent;
+  }
+
+  option {
+    color: white;
+    background-color: black;
+
+    &::checkmark {
+      display: none;
+    }
+
+    &:checked {
+      background-color: rgb(255 255 255 / 10%);
+    }
+
+    &:hover {
+      background-color: rgb(255 255 255 / 20%);
+    }
+  }
+}
+
+button {
+  padding: 0.25rem;
+  margin-left: 0.125rem;
+  gap: 0.25rem;
+  cursor: pointer;
+  border: none;
+  font-size: 0.9rem;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  display: inline-flex;
+
+  &:hover {
+    background-color: #d3d3d3;
+  }
+
+  & > img {
+    width: 1rem;
+    aspect-ratio: 1;
+  }
+}

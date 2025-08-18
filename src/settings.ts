@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { TEMPERATURE_UNITS } from './constants';
+import { TemperatureUnits } from './constants';
 import { zeroOne } from './util';
 
 /* #region Overlay Position */
@@ -60,8 +60,8 @@ export interface TemperatureColorStop {
 }
 
 export interface Settings {
-  overlayPosition: OverlayPositionSetting;
-  temperatureUnit: keyof typeof TEMPERATURE_UNITS;
+  overlayPosition: { x: number; y: number };
+  temperatureUnit: TemperatureUnits;
   temperatureGradient: TemperatureColorStop[];
   temperatureGradientMinCelsius: number;
   temperatureGradientMaxCelsius: number;
@@ -100,7 +100,7 @@ export async function saveSettings(
   } else if (typeof change === 'object') {
     setSettings((prevSettings) => ({
       ...prevSettings,
-      change,
+      ...change,
     }));
   }
 

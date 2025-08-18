@@ -1,0 +1,29 @@
+.graphic {
+  padding: 0.5rem;
+  align-self: center;
+
+  & .fill,
+  & .bottom-fill {
+    transition:
+      height 1s linear,
+      color 1s linear;
+  }
+
+  .is-busy & {
+    animation: 1s linear infinite alternate busy;
+
+    & .fill,
+    & .bottom-fill {
+      transition: none;
+    }
+  }
+}
+
+@keyframes busy {
+  0% {
+    color: lightgray;
+  }
+  100% {
+    color: darkgray;
+  }
+}

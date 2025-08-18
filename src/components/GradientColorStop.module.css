@@ -1,0 +1,31 @@
+.gradient-stop {
+  position: absolute;
+  background-color: transparent;
+  translate: -50% 0;
+  height: var(--stop-height);
+  aspect-ratio: 0.9;
+  display: inline-block;
+  border-radius: 4px 4px 2px 2px;
+  border: var(--stop-border-size) solid white;
+  margin-top: var(--stop-tip-height);
+  cursor: grab;
+
+  &::before {
+    content: '';
+    background-color: white;
+    width: var(--stop-tip-height);
+    aspect-ratio: 1;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    translate: -50% -100%;
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  }
+
+  & input[type='color'] {
+    pointer-events: none;
+    width: 1px;
+    aspect-ratio: 1;
+    opacity: 0.01;
+  }
+}

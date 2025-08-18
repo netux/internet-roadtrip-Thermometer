@@ -1,0 +1,27 @@
+.field-group {
+  margin-block: 1rem;
+  gap: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  & label > small {
+    color: lightgray;
+    display: block;
+  }
+
+  & .field-group__label-container,
+  & .field-group__input-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 1ch;
+  }
+
+  & .field-group__input-container {
+    justify-content: end;
+    white-space: nowrap;
+  }
+}

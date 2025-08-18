@@ -1,0 +1,32 @@
+.gradient-marker {
+  --marker-color: pink;
+
+  position: absolute;
+  top: 0;
+  translate: -50% -133%;
+  text-align: center;
+  white-space: nowrap;
+  font-size: 75%;
+  text-shadow: 0 0 3px black;
+  pointer-events: none;
+
+  &.gradient-marker--current {
+    --marker-color: gray;
+  }
+
+  &.gradient-marker--cursor {
+    --marker-color: red;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    translate: -50% 100%;
+    left: 50%;
+    bottom: 0;
+    width: 1rem;
+    height: 0.5rem;
+    background-color: var(--marker-color);
+    clip-path: polygon(50% 100%, 0 0, 100% 0);
+  }
+}

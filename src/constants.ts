@@ -33,3 +33,4 @@ export const TEMPERATURE_UNITS = {
     fromCelsius: (celsius) => celsius + 273,
   },
 } satisfies Record<string, TemperatureUnit>;
+export type TemperatureUnits = keyof typeof TEMPERATURE_UNITS;

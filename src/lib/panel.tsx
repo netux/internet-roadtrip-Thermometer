@@ -3,6 +3,7 @@ import { MOD_DOM_SAFE_PREFIX } from '../constants';
 import { Movable } from './movable';
 import type { JSX } from 'solid-js/jsx-runtime';
 import { render } from 'solid-js/web';
+import { shadowRootContext } from '../components/ShadowRooted';
 
 export interface IPanelBodyProps {
   panel: Panel;
@@ -33,16 +34,16 @@ export function makePanel(options: PanelOptions): Panel {
       'style',
       {},
       `
-  ${MOD_DOM_SAFE_PREFIX}wrapper {
-    position: fixed;
-    z-index: ${options.zIndex ?? Number.MAX_SAFE_INTEGER - 1};
-    pointer-events: none;
+      ${MOD_DOM_SAFE_PREFIX}wrapper {
+        position: fixed;
+        z-index: ${options.zIndex ?? Number.MAX_SAFE_INTEGER - 1};
+        pointer-events: none;
 
-    & > * {
-      pointer-events: initial;
-    }
-  }
-  `,
+        & > * {
+          pointer-events: initial;
+        }
+      }
+      `,
     ),
   );
 
@@ -64,7 +65,13 @@ export function makePanel(options: PanelOptions): Panel {
     },
   } satisfies Panel;
 
-  render(() => <options.element panel={/* @once */ panel} />, panel.wrapperEl);
+  render(() => {
+    return (
+      <shadowRootContext.Provider value={() => shadowRoot}>
+        <options.element panel={/* @once */ panel} />
+      </shadowRootContext.Provider>
+    );
+  }, panel.wrapperEl);
 
   return panel;
 }

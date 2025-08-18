@@ -1,4 +1,4 @@
-.thermometer {
+.container {
   /* Theme: transparent */
   background-color: transparent;
   border: none;
@@ -16,34 +16,15 @@
     pointer-events: initial;
   }
 
-  & .thermometer__graphic {
+  & .graphic {
     cursor: grab;
 
-    padding: 0.5rem;
-    align-self: center;
-
-    &.thermometer__graphic--grabbed {
+    .is-being-grabbed & {
       cursor: grabbing;
-    }
-
-    & .thermometer__graphic-fill,
-    .thermometer__graphic-bottom-fill {
-      transition:
-        height 1s linear,
-        color 1s linear;
-    }
-
-    .thermometer--loading & {
-      animation: 1s linear infinite alternate thermometer-loading;
-
-      & #fill,
-      #bottom-fill {
-        transition: none;
-      }
     }
   }
 
-  & .thermometer__info {
+  & .info {
     min-width: 8ch;
     margin-block: 0.5rem;
     font-family: 'Roboto', sans-serif;
@@ -58,30 +39,17 @@
     & :is(p, h1, h2, h3, h4, h5, h6) {
       margin: 0;
     }
-
-    .thermometer--loading & {
-      visibility: hidden;
-    }
   }
 
-  & .thermometer__error-info {
+  & .error {
     color: #ff4141;
   }
 
-  &.thermometer--info-on-the-right {
+  &.is-info-on-the-right {
     flex-direction: row-reverse;
 
-    & .thermometer__info {
+    & .info {
       text-align: left;
     }
-  }
-}
-
-@keyframes thermometer-loading {
-  0% {
-    color: lightgray;
-  }
-  100% {
-    color: darkgray;
   }
 }

@@ -2,7 +2,7 @@ import { createEffect } from 'solid-js';
 import { settings } from './settings';
 import { zeroOne } from './util';
 
-const temperatureCanvasGradientCtx = document
+export const temperatureCanvasGradientCtx = document
   .createElement('canvas')
   .getContext('2d');
 
@@ -34,7 +34,7 @@ export function redrawTemperatureCanvas() {
 }
 
 createEffect(() => {
-  if (settings()?.temperatureGradient) {
+  if (settings()?.temperatureGradient != null) {
     redrawTemperatureCanvas();
   }
 });

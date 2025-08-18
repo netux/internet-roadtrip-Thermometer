@@ -19,7 +19,7 @@ const { packageJson } =
 const extensions = ['.ts', '.tsx', '.mjs', '.js', '.jsx'];
 
 export default defineConfig({
-  input: 'src/index.ts',
+  input: 'src/index.tsx',
   plugins: [
     postcssPlugin({
       inject: false,
