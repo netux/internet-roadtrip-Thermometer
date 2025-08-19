@@ -11,7 +11,7 @@ import {
 import { defineConfig } from 'rollup';
 import tlaPlugin from 'rollup-plugin-tla';
 import postcssPlugin from 'rollup-plugin-postcss';
-import userscript from '@netux/rollup-plugin-userscript';
+import userscript from 'rollup-plugin-userscript';
 import { MOD_DOM_SAFE_PREFIX } from './src/constants';
 
 const { packageJson } =
