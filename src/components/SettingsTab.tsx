@@ -8,7 +8,9 @@ import SettingsFieldGroup from './SettingsFieldGroup';
 import SettingsGradientFieldGroup from './SettingsGradientFieldGroup';
 import { DEFAULT_WIDGET_POSITION, saveSettings, settings } from '../settings';
 import SingleInstanceStyle from './SingleInstanceStyle';
-import { stylesheet as irfPanelDesignStylesheet } from '../irf-panel-design.module.css';
+import irfPanelDesignStyles, {
+  stylesheet as irfPanelDesignStylesheet,
+} from '../irf-panel-design.module.css';
 import { stylesheet } from './SettingsTab.module.css';
 
 const SettingsTemperatureUnitFieldGroup = () => {
@@ -33,6 +35,52 @@ const SettingsTemperatureUnitFieldGroup = () => {
   );
 };
 
+const SettingsTime24HourFieldGroup = () => {
+  const label = 'Use AM/PM';
+  const id = `${MOD_DOM_SAFE_PREFIX}time-24-hour`;
+
+  const onChange = async (event: Event) => {
+    await saveSettings({
+      time24Hours: !(event.currentTarget as HTMLInputElement).checked,
+    });
+  };
+
+  return (
+    <SettingsFieldGroup id={id} label={label}>
+      <input
+        id={id}
+        class={irfPanelDesignStyles['toggle']}
+        type="checkbox"
+        on:change={onChange}
+        checked={!settings().time24Hours}
+      />
+    </SettingsFieldGroup>
+  );
+};
+
+const SettingsTimeIncludeSecondsFieldGroup = () => {
+  const label = 'Show Seconds';
+  const id = `${MOD_DOM_SAFE_PREFIX}time-include-seconds`;
+
+  const onChange = async (event: Event) => {
+    await saveSettings({
+      timeIncludeSeconds: (event.currentTarget as HTMLInputElement).checked,
+    });
+  };
+
+  return (
+    <SettingsFieldGroup id={id} label={label}>
+      <input
+        id={id}
+        class={irfPanelDesignStyles['toggle']}
+        type="checkbox"
+        on:change={onChange}
+        checked={settings().timeIncludeSeconds}
+      />
+    </SettingsFieldGroup>
+  );
+};
+
 export type Props = void;
 
 export default () => {
@@ -43,8 +91,14 @@ export default () => {
         {irfPanelDesignStylesheet}
       </SingleInstanceStyle>
 
+      <h2>Clock</h2>
+      <SettingsTime24HourFieldGroup />
+      <SettingsTimeIncludeSecondsFieldGroup />
+
+      <h2>Temperature</h2>
       <SettingsTemperatureUnitFieldGroup />
       <SettingsGradientFieldGroup />
+
       <button
         on:click={async () => {
           await saveSettings({

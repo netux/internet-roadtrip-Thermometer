@@ -38,3 +38,14 @@ export const waitForCoordinatesToBeSetAtLeastOnce = IRF.vdom.container.then(
     });
   },
 );
+
+export const offsetTimezone = (date: Date, utcOffsetSeconds: number): Date => {
+  const localUtcOffsetUtcSeconds = -date.getTimezoneOffset() * 60;
+
+  const result = new Date(date);
+  result.setSeconds(
+    result.getSeconds() - localUtcOffsetUtcSeconds + utcOffsetSeconds,
+  );
+
+  return result;
+};

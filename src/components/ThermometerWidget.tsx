@@ -19,8 +19,84 @@ import SingleInstanceStyle from './SingleInstanceStyle';
 import ThermometerGraphic from './ThermometerGraphic';
 import { Pet } from '../lib/pet';
 import { Heart } from '../lib/heart';
+import { offsetTimezone } from '../util';
+import { Forecast } from '../lib/api';
 
 export type Props = IPanelBodyProps;
+
+const CLOCK_EMOJIS_MAP = new Map<number, string>();
+{
+  const firstOClockEmojiCodePoint = '🕐'.codePointAt(0); // one-oclock
+  const lastOClockEmojiCodePoint = '🕛'.codePointAt(0); // twelve-oclock
+  for (
+    let i = 0;
+    i <= lastOClockEmojiCodePoint - firstOClockEmojiCodePoint;
+    i++
+  ) {
+    CLOCK_EMOJIS_MAP.set(
+      (i + 1) % 12,
+      String.fromCodePoint(firstOClockEmojiCodePoint + i),
+    );
+  }
+
+  const firstThirtyEmojiCodePoint = '🕜'.codePointAt(0);
+  const lastThirtyEmojiCodePoint = '🕧'.codePointAt(0);
+  for (
+    let i = 0;
+    i <= lastThirtyEmojiCodePoint - firstThirtyEmojiCodePoint;
+    i++
+  ) {
+    CLOCK_EMOJIS_MAP.set(
+      (i + 1.5) % 12,
+      String.fromCodePoint(firstThirtyEmojiCodePoint + i),
+    );
+  }
+}
+
+const useCurrentDate = (updateEveryMs: number) => {
+  const [date, setDate] = createSignal(new Date());
+
+  const updateInterval = setInterval(() => setDate(new Date()), updateEveryMs);
+
+  onCleanup(() => {
+    clearInterval(updateInterval);
+  });
+
+  return date;
+};
+
+const ForecastZoneDateClock = (props: { forecast: Forecast }) => {
+  const currentDate = useCurrentDate(1000);
+
+  const forecastZoneDate = createMemo(() =>
+    offsetTimezone(currentDate(), props.forecast.utc_offset_seconds),
+  );
+
+  const forecastZoneDateEmoji = () => {
+    const decimalHour =
+      (forecastZoneDate().getHours() % 12) +
+      (forecastZoneDate().getMinutes() >= 30 ? 0.5 : 0);
+    return CLOCK_EMOJIS_MAP.get(decimalHour) || '⏰';
+  };
+
+  const prettyForecastZoneDate = createMemo(() => {
+    const date = forecastZoneDate();
+
+    const pad = (n: number) => n.toString().padStart(2, '0');
+
+    if (settings().time24Hours) {
+      return `${pad(date.getHours())}:${pad(date.getMinutes())}${settings().timeIncludeSeconds ? `:${pad(date.getSeconds())}` : ''}`;
+    } else {
+      return `${pad(date.getHours() % 12)}:${pad(date.getMinutes())}${settings().timeIncludeSeconds ? `:${pad(date.getSeconds())}` : ''} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+    }
+  });
+
+  return (
+    <>
+      {forecastZoneDateEmoji()} {prettyForecastZoneDate()}
+    </>
+  );
+};
 
 export default ({ panel }: Props) => {
   let graphicEl: SVGSVGElement;
@@ -186,6 +262,9 @@ export default ({ panel }: Props) => {
           </div>
         </Show>
         <Show when={!globalState.loading() && globalState.forecast() != null}>
+          <p>
+            <ForecastZoneDateClock forecast={globalState.forecast()} />
+          </p>
           <p>
             T:{' '}
             {userTemperatureUnit().fromCelsius(

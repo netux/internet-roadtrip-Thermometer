@@ -5,6 +5,7 @@ export interface Forecast {
     temperature_2m: number;
     relative_humidity_2m: number;
   };
+  utc_offset_seconds: number;
 }
 
 export async function fetchForecast([latitude, longitude]) {
@@ -13,6 +14,7 @@ export async function fetchForecast([latitude, longitude]) {
     `longitude=${longitude}`,
     `current=${['temperature_2m', 'relative_humidity_2m'].join(',')}`,
     `temperature_unit=celsius`,
+    `timezone=auto`,
   ].join('&')}`;
 
   const { status, response: forecastStr } = await GM_fetch({
