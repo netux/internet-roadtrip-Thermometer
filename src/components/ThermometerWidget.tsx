@@ -262,17 +262,23 @@ export default ({ panel }: Props) => {
           </div>
         </Show>
         <Show when={!globalState.loading() && globalState.forecast() != null}>
-          <p>
-            <ForecastZoneDateClock forecast={globalState.forecast()} />
-          </p>
-          <p>
-            T:{' '}
-            {userTemperatureUnit().fromCelsius(
-              globalState.forecast().current.temperature_2m,
-            )}
-            {userTemperatureUnit().unit}
-          </p>
-          <p>H: {globalState.forecast().current.relative_humidity_2m}%</p>
+          <Show when={settings().showClock}>
+            <p>
+              <ForecastZoneDateClock forecast={globalState.forecast()} />
+            </p>
+          </Show>
+          <Show when={settings().showTemperature}>
+            <p>
+              T:{' '}
+              {userTemperatureUnit().fromCelsius(
+                globalState.forecast().current.temperature_2m,
+              )}
+              {userTemperatureUnit().unit}
+            </p>
+          </Show>
+          <Show when={settings().showRelativeHumidity}>
+            <p>H: {globalState.forecast().current.relative_humidity_2m}%</p>
+          </Show>
         </Show>
       </div>
       <ThermometerGraphic

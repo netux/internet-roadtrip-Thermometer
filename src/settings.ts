@@ -56,20 +56,26 @@ export interface TemperatureColorStop {
 
 export interface Settings {
   widgetPosition: { x: number; y: number };
+  showClock: boolean;
   time24Hours: boolean;
   timeIncludeSeconds: boolean;
+  showTemperature: boolean;
   temperatureUnit: TemperatureUnits;
   temperatureGradient: TemperatureColorStop[];
   temperatureGradientMinCelsius: number;
   temperatureGradientMaxCelsius: number;
+  showRelativeHumidity: boolean;
 }
 
 const [settings, setSettings] = createSignal<Settings>({
   widgetPosition: DEFAULT_WIDGET_POSITION,
+  showClock: true,
   time24Hours: true,
   timeIncludeSeconds: false,
+  showTemperature: true,
   temperatureUnit: 'celsius',
   ...getDefaultTemperatureGradientSettings(),
+  showRelativeHumidity: true,
 });
 
 export { settings };

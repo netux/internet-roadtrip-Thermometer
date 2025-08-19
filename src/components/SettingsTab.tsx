@@ -1,4 +1,4 @@
-import { For } from 'solid-js';
+import { For, mergeProps } from 'solid-js';
 import {
   MOD_DOM_SAFE_PREFIX,
   TEMPERATURE_UNITS,
@@ -6,12 +6,21 @@ import {
 } from '../constants';
 import SettingsFieldGroup from './SettingsFieldGroup';
 import SettingsGradientFieldGroup from './SettingsGradientFieldGroup';
-import { DEFAULT_WIDGET_POSITION, saveSettings, settings } from '../settings';
+import {
+  DEFAULT_WIDGET_POSITION,
+  saveSettings,
+  Settings,
+  settings,
+} from '../settings';
 import SingleInstanceStyle from './SingleInstanceStyle';
 import irfPanelDesignStyles, {
   stylesheet as irfPanelDesignStylesheet,
 } from '../irf-panel-design.module.css';
 import { stylesheet } from './SettingsTab.module.css';
+
+type KeysMatching<T, ValueType> = {
+  [K in keyof T]: T[K] extends ValueType ? K : never;
+}[keyof T];
 
 const SettingsTemperatureUnitFieldGroup = () => {
   const label = 'Temperature Unit';
@@ -35,47 +44,40 @@ const SettingsTemperatureUnitFieldGroup = () => {
   );
 };
 
-const SettingsTime24HourFieldGroup = () => {
-  const label = 'Use AM/PM';
-  const id = `${MOD_DOM_SAFE_PREFIX}time-24-hour`;
-
-  const onChange = async (event: Event) => {
-    await saveSettings({
-      time24Hours: !(event.currentTarget as HTMLInputElement).checked,
-    });
-  };
-
-  return (
-    <SettingsFieldGroup id={id} label={label}>
-      <input
-        id={id}
-        class={irfPanelDesignStyles['toggle']}
-        type="checkbox"
-        on:change={onChange}
-        checked={!settings().time24Hours}
-      />
-    </SettingsFieldGroup>
+const SettingsToggleFieldGroup = function (props: {
+  id: string;
+  label: string;
+  field: KeysMatching<Settings, boolean>;
+  inverted?: boolean;
+  disabled?: boolean;
+}) {
+  props = mergeProps(
+    {
+      inverted: false,
+      disabled: false,
+    },
+    props,
   );
-};
-
-const SettingsTimeIncludeSecondsFieldGroup = () => {
-  const label = 'Show Seconds';
-  const id = `${MOD_DOM_SAFE_PREFIX}time-include-seconds`;
 
   const onChange = async (event: Event) => {
+    const checked = (event.currentTarget as HTMLInputElement).checked;
+
     await saveSettings({
-      timeIncludeSeconds: (event.currentTarget as HTMLInputElement).checked,
+      [props.field]: props.inverted ? !checked : checked,
     });
   };
 
   return (
-    <SettingsFieldGroup id={id} label={label}>
+    <SettingsFieldGroup id={props.id} label={props.label}>
       <input
-        id={id}
+        id={props.id}
         class={irfPanelDesignStyles['toggle']}
         type="checkbox"
         on:change={onChange}
-        checked={settings().timeIncludeSeconds}
+        checked={
+          props.inverted ? !settings()[props.field] : settings()[props.field]
+        }
+        disabled={props.disabled}
       />
     </SettingsFieldGroup>
   );
@@ -92,12 +94,40 @@ export default () => {
       </SingleInstanceStyle>
 
       <h2>Clock</h2>
-      <SettingsTime24HourFieldGroup />
-      <SettingsTimeIncludeSecondsFieldGroup />
+      <SettingsToggleFieldGroup
+        id={`${MOD_DOM_SAFE_PREFIX}show-clock`}
+        label="Show Clock"
+        field="showClock"
+      />
+      <SettingsToggleFieldGroup
+        id={`${MOD_DOM_SAFE_PREFIX}time-24-hour`}
+        label="Use AM/PM"
+        field="time24Hours"
+        inverted={true}
+        disabled={!settings().showClock}
+      />
+      <SettingsToggleFieldGroup
+        id={`${MOD_DOM_SAFE_PREFIX}time-include-seconds`}
+        label="Show Seconds"
+        field="timeIncludeSeconds"
+        disabled={!settings().showClock}
+      />
 
       <h2>Temperature</h2>
+      <SettingsToggleFieldGroup
+        id={`${MOD_DOM_SAFE_PREFIX}show-temperature`}
+        label="Show Temperature"
+        field="showTemperature"
+      />
       <SettingsTemperatureUnitFieldGroup />
       <SettingsGradientFieldGroup />
+
+      <h2>Relative Humidity</h2>
+      <SettingsToggleFieldGroup
+        id={`${MOD_DOM_SAFE_PREFIX}show-relative-humidity`}
+        label="Show Relative Humidity"
+        field="showRelativeHumidity"
+      />
 
       <button
         on:click={async () => {
