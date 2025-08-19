@@ -1,6 +1,6 @@
-# internet-roadtrip-thermometer-userscript
+# Internet Roadtrip - Thermometer Userscript
 
-This is a userscript initiated from [@violentmonkey/generator-userscript](https://github.com/violentmonkey/generator-userscript).
+Display a thermometer widget with the temperature, time, and humidity of the current location of the [neal.fun/internet-roadtrip](https://neal.fun/internet-roadtrip) vehicle.
 
 ## Development
 
