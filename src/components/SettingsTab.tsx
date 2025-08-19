@@ -8,6 +8,7 @@ import SettingsFieldGroup from './SettingsFieldGroup';
 import SettingsGradientFieldGroup from './SettingsGradientFieldGroup';
 import { DEFAULT_WIDGET_POSITION, saveSettings, settings } from '../settings';
 import SingleInstanceStyle from './SingleInstanceStyle';
+import { stylesheet as irfPanelDesignStylesheet } from '../irf-panel-design.module.css';
 import { stylesheet } from './SettingsTab.module.css';
 
 const SettingsTemperatureUnitFieldGroup = () => {
@@ -38,6 +39,10 @@ export default () => {
   return (
     <>
       <SingleInstanceStyle key="SettingsTab">{stylesheet}</SingleInstanceStyle>
+      <SingleInstanceStyle key="IRFTabExported">
+        {irfPanelDesignStylesheet}
+      </SingleInstanceStyle>
+
       <SettingsTemperatureUnitFieldGroup />
       <SettingsGradientFieldGroup />
       <button
