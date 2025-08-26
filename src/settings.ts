@@ -1,6 +1,11 @@
 import { createMemo, createSignal } from 'solid-js';
-import { MOD_LOG_PREFIX, TemperatureUnits } from './constants';
+import {
+  MOD_LOG_PREFIX,
+  IS_MOBILE_MEDIA_QUERY,
+  TemperatureUnits,
+} from './constants';
 import { zeroOne } from './util';
+import { createMediaQuery } from '@solid-primitives/media';
 
 /* #region Widget Position */
 export interface XYPosition {
@@ -87,6 +92,7 @@ export interface TemperatureColorStop {
 
 export interface Settings {
   widgetPosition?: AnchorPosition;
+  widgetMobilePosition?: AnchorPosition;
   showClock: boolean;
   time24Hours: boolean;
   timeIncludeSeconds: boolean;
@@ -100,6 +106,7 @@ export interface Settings {
 
 const [settings, setSettings] = createSignal<Settings>({
   widgetPosition: undefined,
+  widgetMobilePosition: undefined,
   showClock: true,
   time24Hours: true,
   timeIncludeSeconds: false,
@@ -199,11 +206,30 @@ export async function saveSettings(
   }
 }
 
+const isMobile = createMediaQuery(IS_MOBILE_MEDIA_QUERY);
+
 export const resolvedWidgetPositionSetting = createMemo((): XYPosition => {
-  const anchor = settings().widgetPosition ?? getDefaultWidgetPosition();
+  let anchor: AnchorPosition;
+
+  if (isMobile()) {
+    anchor =
+      settings().widgetMobilePosition ??
+      settings().widgetPosition ??
+      getDefaultWidgetPosition();
+  } else {
+    anchor =
+      settings().widgetPosition ??
+      settings().widgetMobilePosition ??
+      getDefaultWidgetPosition();
+  }
 
   return {
     x: 'left' in anchor ? anchor.left : window.innerWidth - anchor.right,
     y: 'top' in anchor ? anchor.top : window.innerHeight - anchor.bottom,
   };
 });
+
+export const resolvedWidgetPositionKey = () =>
+  (isMobile()
+    ? 'widgetMobilePosition'
+    : 'widgetPosition') satisfies keyof Settings;

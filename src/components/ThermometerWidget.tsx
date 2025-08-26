@@ -13,6 +13,7 @@ import {
   saveSettings,
   settings,
   resolvedWidgetPositionSetting,
+  resolvedWidgetPositionKey,
   makeWidgetPositionSetting,
 } from '../settings';
 import {
@@ -126,7 +127,7 @@ export default ({ panel }: Props) => {
     await saveSettings((prevSettings) => {
       return {
         ...prevSettings,
-        widgetPosition: makeWidgetPositionSetting({
+        [resolvedWidgetPositionKey()]: makeWidgetPositionSetting({
           x: left,
           y: top,
         }),

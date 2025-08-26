@@ -6,6 +6,8 @@ export const MOD_LOG_PREFIX = `[${MOD_NAME}]`;
 
 export const RAD_TO_DEG = 180 / Math.PI;
 
+export const IS_MOBILE_MEDIA_QUERY = 'screen and (max-width: 900px)';
+
 export interface TemperatureUnit {
   label: string;
   unit: string;

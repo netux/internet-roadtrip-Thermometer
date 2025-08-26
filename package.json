@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.24.1",
+    "@solid-primitives/media": "^2.3.3",
     "@violentmonkey/dom": "^2.2.1",
     "internet-roadtrip-framework": "0.4.1-beta",
     "solid-js": "^1.8.16"

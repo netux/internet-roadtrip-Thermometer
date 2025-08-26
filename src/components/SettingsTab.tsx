@@ -11,6 +11,7 @@ import {
   saveSettings,
   Settings,
   settings,
+  resolvedWidgetPositionKey,
 } from '../settings';
 import SingleInstanceStyle from './SingleInstanceStyle';
 import irfPanelDesignStyles, {
@@ -132,7 +133,9 @@ export default () => {
       <button
         on:click={async () => {
           await saveSettings({
-            widgetPosition: getDefaultWidgetPosition(),
+            widgetPosition: undefined,
+            widgetMobilePosition: undefined,
+            [resolvedWidgetPositionKey()]: getDefaultWidgetPosition(),
           });
         }}
       >
