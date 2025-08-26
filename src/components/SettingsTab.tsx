@@ -7,7 +7,7 @@ import {
 import SettingsFieldGroup from './SettingsFieldGroup';
 import SettingsGradientFieldGroup from './SettingsGradientFieldGroup';
 import {
-  DEFAULT_WIDGET_POSITION,
+  getDefaultWidgetPosition,
   saveSettings,
   Settings,
   settings,
@@ -132,7 +132,7 @@ export default () => {
       <button
         on:click={async () => {
           await saveSettings({
-            widgetPosition: DEFAULT_WIDGET_POSITION,
+            widgetPosition: getDefaultWidgetPosition(),
           });
         }}
       >

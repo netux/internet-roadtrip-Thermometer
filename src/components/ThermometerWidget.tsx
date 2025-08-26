@@ -9,7 +9,12 @@ import {
 import styles, { stylesheet } from './ThermometerWidget.module.css';
 import { IPanelBodyProps } from '../lib/panel';
 import * as globalState from '../global-state';
-import { saveSettings, settings } from '../settings';
+import {
+  saveSettings,
+  settings,
+  resolvedWidgetPositionSetting,
+  makeWidgetPositionSetting,
+} from '../settings';
 import {
   sampleTemperatureGradient,
   temperatureGradientHasRedrawn,
@@ -121,10 +126,10 @@ export default ({ panel }: Props) => {
     await saveSettings((prevSettings) => {
       return {
         ...prevSettings,
-        widgetPosition: {
-          x: left / window.innerWidth,
-          y: top / window.innerHeight,
-        },
+        widgetPosition: makeWidgetPositionSetting({
+          x: left,
+          y: top,
+        }),
       };
     });
   };
@@ -190,20 +195,17 @@ export default ({ panel }: Props) => {
   });
 
   createEffect((prevWidgetPosition: { x: number; y: number }) => {
-    const newWidgetPosition = settings().widgetPosition;
+    const newWidgetPosition = resolvedWidgetPositionSetting();
 
     if (
       newWidgetPosition.x !== prevWidgetPosition.x ||
       newWidgetPosition.y !== prevWidgetPosition.y
     ) {
-      panel.movable.setPosition(
-        newWidgetPosition.x * window.innerWidth,
-        newWidgetPosition.y * window.innerHeight,
-      );
+      panel.movable.setPosition(newWidgetPosition.x, newWidgetPosition.y);
     }
 
     return newWidgetPosition;
-  }, settings().widgetPosition);
+  }, resolvedWidgetPositionSetting());
 
   const userTemperatureUnit = createMemo(
     () => TEMPERATURE_UNITS[settings().temperatureUnit],

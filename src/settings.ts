@@ -1,13 +1,44 @@
-import { createSignal } from 'solid-js';
-import { TemperatureUnits } from './constants';
+import { createMemo, createSignal } from 'solid-js';
+import { MOD_LOG_PREFIX, TemperatureUnits } from './constants';
 import { zeroOne } from './util';
 
 /* #region Widget Position */
-export const DEFAULT_WIDGET_POSITION = {
-  x: 0.5,
-  y: 0.5,
+export interface XYPosition {
+  x: number;
+  y: number;
+}
+
+export type AnchorPosition =
+  | { top: number; left: number }
+  | { top: number; right: number }
+  | { bottom: number; left: number }
+  | { bottom: number; right: number };
+
+export const makeWidgetPositionSetting = ({
+  x,
+  y,
+}: XYPosition): AnchorPosition => {
+  const result: Record<string, number> = {};
+
+  if (x < window.innerWidth / 2) {
+    result.left = x;
+  } else {
+    result.right = window.innerWidth - x;
+  }
+  if (y < window.innerHeight / 2) {
+    result.top = y;
+  } else {
+    result.bottom = window.innerHeight - y;
+  }
+
+  return result as AnchorPosition;
 };
-/* #endregion Overlay Position */
+
+export const getDefaultWidgetPosition = (): AnchorPosition => ({
+  left: window.innerWidth / 2,
+  top: window.innerHeight / 2,
+});
+/* #endregion Widget Position */
 
 /* #region Default Temperature Gradient */
 export const DEFAULT_TEMPERATURE_GRADIENT = [
@@ -55,7 +86,7 @@ export interface TemperatureColorStop {
 }
 
 export interface Settings {
-  widgetPosition: { x: number; y: number };
+  widgetPosition?: AnchorPosition;
   showClock: boolean;
   time24Hours: boolean;
   timeIncludeSeconds: boolean;
@@ -68,7 +99,7 @@ export interface Settings {
 }
 
 const [settings, setSettings] = createSignal<Settings>({
-  widgetPosition: DEFAULT_WIDGET_POSITION,
+  widgetPosition: undefined,
   showClock: true,
   time24Hours: true,
   timeIncludeSeconds: false,
@@ -91,29 +122,58 @@ export { settings };
   // Migration from <2.0.0, when the widget was refered to as an overlay
   {
     const noValue = Symbol();
-    type WidgetPositionType =
-      | Settings['widgetPosition']
-      | null
-      | typeof noValue;
-
     const hasWidgetPositionValue =
-      (await GM.getValue<WidgetPositionType>(
+      (await GM.getValue<AnchorPosition | typeof noValue>(
         'widgetPosition' as keyof Settings,
         noValue,
       )) === noValue;
-    const oldOverlayPositionValue = await GM.getValue<WidgetPositionType>(
-      'overlayPosition',
-      noValue,
-    );
+    const oldOverlayPositionValue = await GM.getValue<
+      XYPosition | typeof noValue
+    >('overlayPosition', noValue);
     if (!hasWidgetPositionValue && oldOverlayPositionValue !== noValue) {
-      newSettings.widgetPosition = oldOverlayPositionValue;
+      newSettings.widgetPosition = makeWidgetPositionSetting({
+        x: oldOverlayPositionValue.x,
+        y: oldOverlayPositionValue.y,
+      });
       await GM.deleteValue('overlayPosition');
     }
   }
 
-  // Migration from <=1.2.2, when the widget position was null by default
-  if (newSettings.widgetPosition == null) {
-    newSettings.widgetPosition = DEFAULT_WIDGET_POSITION;
+  // Migration from <2.1.0, when the widget position was stored as a percentage
+  {
+    if (
+      newSettings.widgetPosition != null &&
+      typeof newSettings.widgetPosition === 'object' &&
+      !(
+        'left' in newSettings.widgetPosition ||
+        'right' in newSettings.widgetPosition
+      ) &&
+      !(
+        'top' in newSettings.widgetPosition ||
+        'bottom' in newSettings.widgetPosition
+      )
+    ) {
+      const unknownWidgetPosition: Record<string, unknown> =
+        newSettings.widgetPosition;
+
+      if (
+        'x' in unknownWidgetPosition &&
+        typeof unknownWidgetPosition.x === 'number' &&
+        'y' in unknownWidgetPosition &&
+        typeof unknownWidgetPosition.y === 'number'
+      ) {
+        newSettings.widgetPosition = makeWidgetPositionSetting({
+          x: unknownWidgetPosition.x * window.innerWidth,
+          y: unknownWidgetPosition.y * window.innerHeight,
+        });
+      } else {
+        console.warn(
+          MOD_LOG_PREFIX,
+          'Corrupt widget position setting detected. Resetting...',
+        );
+        newSettings.widgetPosition = undefined;
+      }
+    }
   }
 
   setSettings(newSettings);
@@ -138,3 +198,12 @@ export async function saveSettings(
     await GM.setValue(key, currentSettings[key]);
   }
 }
+
+export const resolvedWidgetPositionSetting = createMemo((): XYPosition => {
+  const anchor = settings().widgetPosition ?? getDefaultWidgetPosition();
+
+  return {
+    x: 'left' in anchor ? anchor.left : window.innerWidth - anchor.right,
+    y: 'top' in anchor ? anchor.top : window.innerHeight - anchor.bottom,
+  };
+});

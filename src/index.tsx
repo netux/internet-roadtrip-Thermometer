@@ -9,7 +9,7 @@ import {
 import { waitForCoordinatesToBeSetAtLeastOnce } from './util';
 import { MOD_LOG_PREFIX, MOD_NAME } from './constants';
 import { fetchForecast, type Forecast } from './lib/api';
-import { settings } from './settings';
+import { resolvedWidgetPositionSetting } from './settings';
 import { makePanel } from './lib/panel';
 import Thermometer from './components/ThermometerWidget';
 import irfTabStyles, {
@@ -28,8 +28,8 @@ function createWidget() {
   panel.show();
 
   panel.movable.setPosition(
-    settings().widgetPosition.x * window.innerWidth,
-    settings().widgetPosition.y * window.innerHeight,
+    resolvedWidgetPositionSetting().x,
+    resolvedWidgetPositionSetting().y,
   );
 }
 
