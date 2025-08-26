@@ -201,7 +201,10 @@ export default ({ panel }: Props) => {
       newWidgetPosition.x !== prevWidgetPosition.x ||
       newWidgetPosition.y !== prevWidgetPosition.y
     ) {
-      panel.movable.setPosition(newWidgetPosition.x, newWidgetPosition.y);
+      panel.movable.setPosition(
+        Math.round(newWidgetPosition.x),
+        Math.round(newWidgetPosition.y),
+      );
     }
 
     return newWidgetPosition;

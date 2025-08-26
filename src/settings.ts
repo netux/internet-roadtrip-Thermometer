@@ -35,8 +35,8 @@ export const makeWidgetPositionSetting = ({
 };
 
 export const getDefaultWidgetPosition = (): AnchorPosition => ({
-  left: window.innerWidth / 2,
-  top: window.innerHeight / 2,
+  left: Math.round(window.innerWidth / 2),
+  top: Math.round(window.innerHeight / 2),
 });
 /* #endregion Widget Position */
 
