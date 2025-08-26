@@ -35,7 +35,14 @@ function createWidget() {
 
 function createIrfTab() {
   const irfTab = IRF.ui.panel.createTabFor(
-    { ...GM.info, script: { ...GM.info.script, name: MOD_NAME } },
+    {
+      ...GM.info,
+      script: {
+        ...GM.info.script,
+        name: MOD_NAME,
+        icon: null, // prevent slowing down presence of IRF button while downloading our custom icon
+      },
+    },
     {
       tabName: MOD_NAME,
       className: irfTabStyles['tab-content'],
