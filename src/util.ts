@@ -49,3 +49,26 @@ export const offsetTimezone = (date: Date, utcOffsetSeconds: number): Date => {
 
   return result;
 };
+
+export const isTrulyInternetRoadtrip = () =>
+  IRF.isInternetRoadtrip && // has hooked into IRT
+  location.pathname.startsWith('/internet-roadtrip'); // is on the IRT page
+
+export const waitFor = async (
+  checkFn: () => boolean | Promise<boolean>,
+  { intervalMs = 1000 }: { intervalMs?: number } = {},
+): Promise<void> => {
+  const immediateSuccess = await checkFn();
+  if (immediateSuccess) {
+    return;
+  }
+
+  return await new Promise((resolve) => {
+    const interval = setInterval(async () => {
+      if (await checkFn()) {
+        clearInterval(interval);
+        resolve();
+      }
+    }, intervalMs);
+  });
+};

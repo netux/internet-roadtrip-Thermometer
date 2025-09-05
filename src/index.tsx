@@ -1,12 +1,21 @@
 import './meta.js?userscript-metadata';
 import IRF from 'internet-roadtrip-framework';
 import {
+  widgetPanel,
   setForecastLoadFailure,
   setForecastLoadSuccess,
   setForecastLoading,
-  setPanel,
+  setWidgetPanel,
+  setTickForecastInterval,
+  tickForecastInterval,
+  setIrfTab,
+  irfTab,
 } from './global-state';
-import { waitForCoordinatesToBeSetAtLeastOnce } from './util';
+import {
+  isTrulyInternetRoadtrip,
+  waitFor,
+  waitForCoordinatesToBeSetAtLeastOnce,
+} from './util';
 import { MOD_LOG_PREFIX, MOD_NAME } from './constants';
 import { fetchForecast, type Forecast } from './lib/api';
 import { resolvedWidgetPositionSetting } from './settings';
@@ -24,7 +33,7 @@ function createWidget() {
     element: Thermometer,
     zIndex: 200,
   });
-  setPanel(panel);
+  setWidgetPanel(panel);
   panel.show();
 
   panel.movable.setPosition(
@@ -49,6 +58,7 @@ function createIrfTab() {
       style: irfTabStylesheet,
     },
   );
+  setIrfTab(irfTab);
 
   render(
     // <ShadowRooted> is a workaround for IRF not having per-tab stylesheet isolation.
@@ -84,9 +94,34 @@ async function tickForecast() {
   setForecastLoadSuccess(forecast);
 }
 
-createWidget();
-createIrfTab();
-waitForCoordinatesToBeSetAtLeastOnce.then(() => {
-  setInterval(tickForecast, 15 * 60_000 /* every 15 minutes */);
-  tickForecast();
-});
+function boot() {
+  if (widgetPanel() == null) {
+    createWidget();
+  }
+
+  if (irfTab() == null) {
+    createIrfTab();
+  }
+
+  waitForCoordinatesToBeSetAtLeastOnce.then(() => {
+    setTickForecastInterval(
+      setInterval(tickForecast, 15 * 60_000 /* every 15 minutes */),
+    );
+    tickForecast();
+  });
+
+  waitFor(() => !isTrulyInternetRoadtrip()).then(shut);
+}
+
+function shut() {
+  widgetPanel()?.hide();
+
+  if (tickForecastInterval() != null) {
+    clearInterval(tickForecastInterval());
+    setTickForecastInterval(null);
+  }
+
+  waitFor(isTrulyInternetRoadtrip).then(boot);
+}
+
+waitFor(isTrulyInternetRoadtrip).then(boot);
